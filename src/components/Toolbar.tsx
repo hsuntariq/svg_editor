@@ -1,5 +1,5 @@
 import React from 'react';
-import { MousePointer2, Square, Circle, Pen, Type, ZoomIn, ZoomOut, Upload, Download, Undo2, Redo2, Ruler, Scissors, WineIcon as LineIcon } from 'lucide-react';
+import { MousePointer2, Square, Circle, Pen, Type, ZoomIn, ZoomOut, Upload, Download, Undo2, Redo2, Ruler, Scissors, WineIcon as LineIcon, PenTool } from 'lucide-react';
 import type { Tool } from '../types';
 
 interface ToolbarProps {
@@ -22,6 +22,7 @@ const tools = [
   { id: 'rect' as Tool, icon: Square, label: 'Rectangle' },
   { id: 'ellipse' as Tool, icon: Circle, label: 'Ellipse' },
   { id: 'line' as Tool, icon: LineIcon, label: 'Line' },
+  { id: 'curve' as Tool, icon: PenTool, label: 'Curve' },
   { id: 'pen' as Tool, icon: Pen, label: 'Pen' },
   { id: 'cut' as Tool, icon: Scissors, label: 'Cut' },
   { id: 'text' as Tool, icon: Type, label: 'Text' },
@@ -42,7 +43,7 @@ export function Toolbar({
   onToggleMeasurements
 }: ToolbarProps) {
   return (
-    <div className="flex overflow-y-scroll flex-col gap-2 bg-gray-800 p-2">
+    <div className="flex flex-col gap-2 overflow-y-scroll bg-gray-800 p-2">
       <div className="flex flex-col gap-2 border-b border-gray-700 pb-2">
         {tools.map((tool) => {
           const Icon = tool.icon;

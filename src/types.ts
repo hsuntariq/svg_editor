@@ -1,4 +1,9 @@
-export type Tool = 'select' | 'rect' | 'ellipse' | 'path' | 'text' | 'pen' | 'line' | 'cut';
+export type Tool = 'select' | 'rect' | 'ellipse' | 'path' | 'text' | 'pen' | 'line' | 'curve' | 'cut';
+
+export interface Point {
+  x: number;
+  y: number;
+}
 
 export interface SVGAttributes {
   id?: string;
@@ -27,7 +32,8 @@ export type Element = {
   id: string;
   type: 'rect' | 'ellipse' | 'path' | 'text' | 'line';
   attributes: SVGAttributes;
-  points?: { x: number; y: number }[];
+  points?: Point[];
+  controlPoints?: Point[];
 };
 
 export type HistoryState = {
