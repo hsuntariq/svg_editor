@@ -43,7 +43,7 @@ export function Toolbar({
   onToggleMeasurements
 }: ToolbarProps) {
   return (
-    <div className="flex flex-col gap-2 overflow-y-scroll bg-gray-800 p-2">
+    <div className="flex  flex-col gap-2 overflow-y-scroll h-[400px] rounded-full py-4 bg-black p-2">
       <div className="flex flex-col gap-2 border-b border-gray-700 pb-2">
         {tools.map((tool) => {
           const Icon = tool.icon;

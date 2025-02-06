@@ -153,7 +153,8 @@ function App() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-900 text-white">
+    <div className="flex h-screen bg-gray-900 text-white ">
+      <div className="p-5 flex flex-col items-center bg-[#0f0f0f]">
       <Toolbar
         activeTool={activeTool}
         onToolChange={setActiveTool}
@@ -167,7 +168,16 @@ function App() {
         canRedo={historyIndex < history.length - 1}
         showMeasurements={showMeasurements}
         onToggleMeasurements={() => setShowMeasurements(!showMeasurements)}
-      />
+        />
+        <div className="grid my-3 grid-cols-3 gap-2">
+          <div className="size bg-gray-800 text-center rounded-md" data-size="HS">HS</div>
+                <div className="size bg-gray-800 text-center rounded-md" data-size="S">S</div>
+                <div className="size bg-gray-800 text-center rounded-md" data-size="L">L</div>
+                <div className="size bg-gray-800 text-center rounded-md" data-size="HL">HL</div>
+                <div className="size bg-gray-800 text-center rounded-md" data-size="2XL">2XL</div>
+                <div className="size bg-gray-800 text-center rounded-md" data-size="3XL">3XL</div>
+        </div>
+        </div>
 
       <div className="flex-1 flex flex-col">
         <div className="p-4 bg-gray-800 flex justify-between items-center">
@@ -175,7 +185,7 @@ function App() {
           <FileConverter onExport={handleExport} />
         </div>
 
-        <div className="flex-1 flex">
+        <div className="flex-1 flex bg-gray-900 p-5">
           <Canvas
             ref={svgRef}
             activeTool={activeTool}
