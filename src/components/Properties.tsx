@@ -10,7 +10,7 @@ interface PropertiesProps {
 export function Properties({ selectedElement, onElementUpdate, onSplitShape }: PropertiesProps) {
   if (!selectedElement) {
     return (
-      <div className="w-64 bg-gray-800 p-4 text-white">
+      <div className="w-64 bg-[#0f0f0f] p-4 text-white">
         <p>No element selected</p>
       </div>
     );
@@ -49,7 +49,7 @@ export function Properties({ selectedElement, onElementUpdate, onSplitShape }: P
   const dimensions = getDimensions();
 
   return (
-    <div className="w-64 h-[90vh] bg-gray-800 p-4  text-white overflow-y-scroll">
+    <div className="w-64 h-[90vh] bg-[#0F0F0F] p-4  text-white overflow-y-scroll">
       <h2 className="text-lg font-bold mb-4">Properties</h2>
       
       <div className="mb-4">

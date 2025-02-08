@@ -786,7 +786,7 @@ export const Canvas = forwardRef<SVGSVGElement, CanvasProps>(
     }, [drawing, activeTool]);
 
     return (
-      <div className="flex-1 overflow-hidden bg-white text-black">
+      <div className="flex-1 overflow-hidden bg-white text-black rounded-xl">
         <svg
           ref={ref}
           className="w-full h-full"

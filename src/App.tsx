@@ -16,7 +16,46 @@ function App() {
   const [showMeasurements, setShowMeasurements] = useState(true);
   const [history, setHistory] = useState<HistoryState[]>([{ elements: [] }]);
   const [historyIndex, setHistoryIndex] = useState(0);
+  const [activeSize, setActiveSize] = useState<string | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
+
+  // Size classification based on dimensions
+  const getSizeCategory = (element: Element): string => {
+    if (element.type === 'rect' || element.type === 'path') {
+      const width = parseFloat(element.attributes.width || '0');
+      const height = parseFloat(element.attributes.height || '0');
+      const area = width * height;
+
+      if (area < 1000) return 'HS';
+      if (area < 5000) return 'S';
+      if (area < 10000) return 'L';
+      if (area < 20000) return 'HL';
+      if (area < 30000) return '2XL';
+      return '3XL';
+    } else if (element.type === 'ellipse') {
+      const rx = parseFloat(element.attributes.rx || '0');
+      const ry = parseFloat(element.attributes.ry || '0');
+      const area = Math.PI * rx * ry;
+
+      if (area < 1000) return 'HS';
+      if (area < 5000) return 'S';
+      if (area < 10000) return 'L';
+      if (area < 20000) return 'HL';
+      if (area < 30000) return '2XL';
+      return '3XL';
+    }
+    return 'S'; // Default size for other shapes
+  };
+
+  // Filter elements based on selected size
+  const filteredElements = activeSize
+    ? elements.filter(element => getSizeCategory(element) === activeSize)
+    : elements;
+
+  // Handle size button click
+  const handleSizeClick = (size: string) => {
+    setActiveSize(activeSize === size ? null : size);
+  };
 
   // History management
   const addToHistory = (newElements: Element[]) => {
@@ -53,7 +92,7 @@ function App() {
       el.id === updatedElement.id ? updatedElement : el
     );
     handleElementsChange(newElements);
-    setSelectedElement(updatedElement); // Keep the element selected after update
+    setSelectedElement(updatedElement);
   };
 
   // Zoom controls
@@ -132,7 +171,6 @@ function App() {
         img.src = 'data:image/svg+xml;base64,' + btoa(svgData);
         break;
       }
-      // DXF and PDF export to be implemented
     }
   };
 
@@ -152,56 +190,63 @@ function App() {
     setShowSplitDialog(false);
   };
 
+  const sizes = ['All', 'HS', 'S', 'L', 'HL', '2XL', '3XL'];
+
   return (
-    <div className="flex h-screen bg-gray-900 text-white ">
+    <div className="flex h-screen bg-[#0f0f0f] text-white">
       <div className="p-5 flex flex-col items-center bg-[#0f0f0f]">
-      <Toolbar
-        activeTool={activeTool}
-        onToolChange={setActiveTool}
-        onZoomIn={handleZoomIn}
-        onZoomOut={handleZoomOut}
-        onUpload={handleUpload}
-        onExport={handleExport}
-        onUndo={handleUndo}
-        onRedo={handleRedo}
-        canUndo={historyIndex > 0}
-        canRedo={historyIndex < history.length - 1}
-        showMeasurements={showMeasurements}
-        onToggleMeasurements={() => setShowMeasurements(!showMeasurements)}
+        <Toolbar
+          activeTool={activeTool}
+          onToolChange={setActiveTool}
+          onZoomIn={handleZoomIn}
+          onZoomOut={handleZoomOut}
+          onUpload={handleUpload}
+          onExport={handleExport}
+          onUndo={handleUndo}
+          onRedo={handleRedo}
+          canUndo={historyIndex > 0}
+          canRedo={historyIndex < history.length - 1}
+          showMeasurements={showMeasurements}
+          onToggleMeasurements={() => setShowMeasurements(!showMeasurements)}
         />
         <div className="grid my-3 grid-cols-3 gap-2">
-          <div className="size bg-gray-800 text-center rounded-md" data-size="HS">HS</div>
-                <div className="size bg-gray-800 text-center rounded-md" data-size="S">S</div>
-                <div className="size bg-gray-800 text-center rounded-md" data-size="L">L</div>
-                <div className="size bg-gray-800 text-center rounded-md" data-size="HL">HL</div>
-                <div className="size bg-gray-800 text-center rounded-md" data-size="2XL">2XL</div>
-                <div className="size bg-gray-800 text-center rounded-md" data-size="3XL">3XL</div>
+          {sizes.map(size => (
+            <button
+              key={size}
+              className={`size p-2 text-center rounded-md transition-colors ${
+                activeSize === size 
+                  ? 'bg-blue-600 hover:bg-blue-700' 
+                  : 'bg-gray-800 hover:bg-gray-700'
+              }`}
+              onClick={() => handleSizeClick(size === 'All' ? null : size)}
+            >
+              {size}
+            </button>
+          ))}
         </div>
-        </div>
+      </div>
 
       <div className="flex-1 flex flex-col">
-        <div className="p-4 bg-gray-800 flex justify-between items-center">
-          <h1 className="text-xl font-bold">SVG Editor</h1>
-          <FileConverter onExport={handleExport} />
-        </div>
-
-        <div className="flex-1 flex bg-gray-900 p-5">
-          <Canvas
-            ref={svgRef}
-            activeTool={activeTool}
-            elements={elements}
-            onElementsChange={handleElementsChange}
-            onElementSelect={setSelectedElement}
-            selectedElement={selectedElement}
-            zoom={zoom}
-            showMeasurements={showMeasurements}
-          />
-
+        <div className="flex h-screen">
+          <div className="flex-1 flex bg-[#0f0f0f] p-5">
+            <Canvas
+              ref={svgRef}
+              activeTool={activeTool}
+              elements={filteredElements}
+              onElementsChange={handleElementsChange}
+              onElementSelect={setSelectedElement}
+              selectedElement={selectedElement}
+              zoom={zoom}
+              showMeasurements={showMeasurements}
+            />
+          </div>
+          <div className="h-screen bg-[#0f0f0f]">
           <Properties
             selectedElement={selectedElement}
             onElementUpdate={handleElementUpdate}
             onSplitShape={handleSplitShape}
           />
+          </div>
         </div>
       </div>
 

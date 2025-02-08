@@ -47,12 +47,13 @@ function getShapeBoundingBox(element: Element): { x: number; y: number; width: n
 
 function getRotationTransform(element: Element): { angle: number; cx: number; cy: number } {
   const transform = element.attributes.transform || '';
-  const match = transform.match(/rotate\(([-\d.]+)\s+([-\d.]+)\s+([-\d.]+)\)/);
+  const match = transform.match(/rotate\(([-\d.]+)(?:\s+([-\d.]+)\s+([-\d.]+))?\)/);
   if (match) {
+    const box = getShapeBoundingBox(element);
     return {
       angle: parseFloat(match[1]),
-      cx: parseFloat(match[2]),
-      cy: parseFloat(match[3])
+      cx: match[2] ? parseFloat(match[2]) : box.x + box.width / 2,
+      cy: match[3] ? parseFloat(match[3]) : box.y + box.height / 2
     };
   }
   const box = getShapeBoundingBox(element);
@@ -79,20 +80,26 @@ export function cutShape(element: Element, cutPath: Point[]): Element[] {
     const angle1 = Math.atan2(startPoint.y - cy, startPoint.x - cx);
     const angle2 = Math.atan2(endPoint.y - cy, endPoint.x - cx);
 
-    // Calculate the sweep flag based on the direction of the cut
-    const sweepFlag = (angle2 - angle1 + 2 * Math.PI) % (2 * Math.PI) > Math.PI ? 0 : 1;
+    // Ensure angles are in the correct range
+    let startAngle = angle1;
+    let endAngle = angle2;
+    if (endAngle < startAngle) endAngle += 2 * Math.PI;
 
-    // Create two paths that split the circle
+    // Calculate the sweep flag based on the direction of the cut
+    const largeArcFlag = Math.abs(endAngle - startAngle) > Math.PI ? 1 : 0;
+    const sweepFlag = 1;
+
+    // Create two paths that split the ellipse
     const path1 = `
-      M ${cx + rx * Math.cos(angle1)} ${cy + ry * Math.sin(angle1)}
-      A ${rx} ${ry} 0 ${sweepFlag} 1 ${cx + rx * Math.cos(angle2)} ${cy + ry * Math.sin(angle2)}
+      M ${cx + rx * Math.cos(startAngle)} ${cy + ry * Math.sin(startAngle)}
+      A ${rx} ${ry} 0 ${largeArcFlag} ${sweepFlag} ${cx + rx * Math.cos(endAngle)} ${cy + ry * Math.sin(endAngle)}
       L ${cx} ${cy}
       Z
     `;
 
     const path2 = `
-      M ${cx + rx * Math.cos(angle1)} ${cy + ry * Math.sin(angle1)}
-      A ${rx} ${ry} 0 ${1 - sweepFlag} 1 ${cx + rx * Math.cos(angle2)} ${cy + ry * Math.sin(angle2)}
+      M ${cx + rx * Math.cos(startAngle)} ${cy + ry * Math.sin(startAngle)}
+      A ${rx} ${ry} 0 ${1 - largeArcFlag} ${1 - sweepFlag} ${cx + rx * Math.cos(endAngle)} ${cy + ry * Math.sin(endAngle)}
       L ${cx} ${cy}
       Z
     `;
